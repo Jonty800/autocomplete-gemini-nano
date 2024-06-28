@@ -2,6 +2,8 @@
 
 This project is a Proof of Concept showcasing the functionality of Google Gemini Nano to provide autocompleted suggestions offline using a local Large Language Model (LLM). This POC demonstrates how to integrate this capability into a simple React application, eliminating the need for expensive alternatives.
 
+<img src="docs/example.png" alt="Example" width="500"/>
+
 ## Features
 
 - Offline autocomplete suggestions using Google Gemini Nano
