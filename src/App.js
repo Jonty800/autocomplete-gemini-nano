@@ -9,9 +9,12 @@ import {
 } from "./@/components/ui/command";
 import { debounce } from "lodash";
 
+const ErrorComponent = React.lazy(() => import("./components/ErrorComponent"));
+
 export default function App() {
   const [suggestions, setSuggestions] = useState([]);
   const [query, setQuery] = useState("");
+  const [showError, setShowError] = useState(false);
 
   const fetchSuggestions = useCallback(
     debounce(async (value) => {
@@ -19,6 +22,9 @@ export default function App() {
       let canCreate = "no";
       if (window?.ai?.canCreateTextSession !== undefined) {
         canCreate = await window.ai.canCreateTextSession(); // "readily", "no", or "after-download"
+        setShowError(canCreate !== "readily");
+      } else {
+        setShowError(true);
       }
       if (canCreate !== "no") {
         const session = await window.ai.createTextSession();
@@ -51,39 +57,46 @@ export default function App() {
   };
 
   return (
-    <div className="grid w-full max-w-md items-center gap-2 antialiased p-8">
-      <Label htmlFor="search">Search</Label>
-      <div className="relative">
-        <Input
-          type="text"
-          id="search"
-          placeholder="Search for something..."
-          className="pr-12"
-          onChange={handleChange}
-        />
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-          <SearchIcon className="h-5 w-5" />
-        </div>
-        {suggestions?.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 overflow-auto bg-background border border-input rounded-md shadow-lg max-h-60">
-            <div className="py-1">
-              <Command>
-                <CommandList>
-                  <CommandGroup>
-                    {suggestions.map((item, index) => (
-                      <CommandItem key={index}>
-                        <div className="flex items-center justify-between capitalize">
-                          <span>{item}</span>
-                        </div>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </div>
+    <div className="w-full">
+      <div className="grid w-full max-w-md items-center gap-2 antialiased p-8">
+        <Label htmlFor="search">Search</Label>
+        <div className="relative">
+          <Input
+            type="text"
+            id="search"
+            placeholder="Search for something..."
+            className="pr-12"
+            onChange={handleChange}
+          />
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+            <SearchIcon className="h-5 w-5" />
           </div>
-        )}
+          {suggestions?.length > 0 && (
+            <div className="absolute z-10 w-full mt-1 overflow-auto bg-background border border-input rounded-md shadow-lg max-h-60">
+              <div className="py-1">
+                <Command>
+                  <CommandList>
+                    <CommandGroup>
+                      {suggestions.map((item, index) => (
+                        <CommandItem key={index}>
+                          <div className="flex items-center justify-between capitalize">
+                            <span>{item}</span>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
+      {showError && (
+        <div className="ml-8">
+          <ErrorComponent />
+        </div>
+      )}
     </div>
   );
 }
