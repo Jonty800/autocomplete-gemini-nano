@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./ui/card"
 
 export default function ErrorComponent() {
   return (

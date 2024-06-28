@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Label } from "../@/components/ui/label";
-import { Input } from "../@/components/ui/input";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
 import {
   CommandList,
   CommandItem,
   CommandGroup,
   Command,
-} from "../@/components/ui/command";
+} from "./ui/command";
 import { debounce } from "lodash";
 import  SearchIcon from "./SearchIcon";
 
