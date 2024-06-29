@@ -1,14 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import {
-  CommandList,
-  CommandItem,
-  CommandGroup,
-  Command,
-} from "./ui/command";
+import { CommandList, CommandItem, CommandGroup, Command } from "./ui/command";
 import { debounce } from "lodash";
-import  SearchIcon from "./SearchIcon";
+import SearchIcon from "./SearchIcon";
 
 const ErrorComponent = React.lazy(() => import("./ErrorComponent"));
 
@@ -19,29 +14,34 @@ export default function App() {
 
   const fetchSuggestions = useCallback(
     debounce(async (value) => {
-      setSuggestions([]);
-      let canCreate = "no";
-      if (window?.ai?.canCreateTextSession !== undefined) {
-        canCreate = await window.ai.canCreateTextSession(); // "readily", "no", or "after-download"
-        setShowError(canCreate !== "readily");
-      } else {
-        setShowError(true);
-      }
-      if (canCreate !== "no") {
-        const session = await window.ai.createTextSession();
-        const response = await session.prompt(
-          `Provide 5 autocomplete suggestions for the following input in English, formatted as a JSON array. \nExample, input="Pets", the output should be \`\`\`json["Cats", "Dogs", "Mice"]\`\`\`<ctrl23>\n. Input="${value}"".`
-        );
-        console.log("response", response);
+      try {
+        setSuggestions([]);
+        let canCreate = "no";
+        if (window?.ai?.canCreateTextSession !== undefined) {
+          canCreate = await window.ai.canCreateTextSession(); // "readily", "no", or "after-download"
+          setShowError(canCreate !== "readily");
+        } else {
+          setShowError(true);
+        }
+        if (canCreate !== "no") {
+          const session = await window.ai.createTextSession();
+          console.log("text", value);
+          const response = await session.prompt(
+            `Provide 5 autocomplete suggestions for the following input in English, formatted as a JSON array. \nExample, input="Pets", the output should be \`\`\`json["Cats", "Dogs", "Mice"]\`\`\`<ctrl23>\n. Input="${value}"".`
+          );
+          console.log("response", response);
 
-        const suggestions = JSON.parse(
-          response
-            .toLowerCase()
-            .replace(/```json|```/gi, "")
-            .trim()
-        );
-        console.log(response);
-        setSuggestions(suggestions);
+          const suggestions = JSON.parse(
+            response
+              .toLowerCase()
+              .replace(/```json|```/gi, "")
+              .trim()
+          );
+          console.log(response);
+          setSuggestions(suggestions);
+        }
+      } catch (error) {
+        console.error(error);
       }
     }, 300),
     []
